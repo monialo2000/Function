@@ -1,7 +1,9 @@
 ---
 title: "Funciones - R Notebook"
-output: html_notebook
-editor_options: 
+output:
+  html_document:
+    df_print: paged
+editor_options:
   chunk_output_type: inline
 ---
 
@@ -142,9 +144,109 @@ names(vector1) <- names(vector1)[1:2]
 tiene_nombre(vector1)
 ```
 
-
+## Argumentos
 Las funciones tienen argumentos obligatorios, y otros que no lo son (en esos casos, normalmente se le pone un valor por default). Los valores obligatorios van al principio, y luego los que son por defecto.  
-Si vas a usar un valor distinto al valor por defecto, debes escribir completo argumento = valor.
+* Si vas a usar un valor distinto al valor por defecto, debes escribir completo argumento = valor.
+
+* Conviene chequea los argumentos que nos pueden traer problemas: si tiene que ser unico valor,  si utiliza 2 argumentos y tienen que ser de igual length, etc.
+
+
+* DotDotDot (puntopuntopunto ...) cuando al definir una función se incluye ... como argumento. No hay control de cantidad de inputs que se envían. Este es un argumento multipropósito útil si tu función principalmente envuelve (wraps) a otra función.
+Si solo quieres capturar los valores de ..., entonces utiliza list(...).
+
+```{r stop}
+wt_mean <- function(x, w) {
+ if (length(x) != length(w)) {
+ stop("`x` y `w` deben tener la misma extensión", call. = FALSE)
+ }
+ sum(w * x) / sum(w)
+}
+```
+
+```{r stopifnot}
+wt_mean <- function(x, w) {
+ stopifnot(length(x) == length(w)) 
+ sum(w * x) / sum(w)
+}
+```
+
+```{r dotdotdot}
+commas <- function(...) stringr::str_c(..., collapse = ", ")
+commas(letters[1:10])
+#> [1] "a, b, c, d, e, f, g, h, i, j"
+
+# pero hay que tener cuidado, puede pasar un error como el siguiente:
+x <- c(1, 2)
+sum(x, na.mr = TRUE)
+#> [1] 4
+```
+
+## Evaluacion perezosa (lazy evaluation)
+Los argumentos en R se evalúan de forma “perezosa”: no se computan hasta que se los necesita. Esto significa que si nunca se los usa, nunca son llamados.
+
+## Valores de retorno:
+ Se puede retonar un valor en cualquier momento. Se usa por ejemplo cuando los inputs tienen longitud o, o cuando se quiere adelantar una situacion.
+ 
+```{r return}
+x <- NULL
+y <- NULL
+
+complicated_function <- function(x, y, z) {
+   if (length(x) == 0 || length(y) == 0) {
+ return(0)
+ }
+ # Código complicado aquí
+}
+
+complicated_function(x, y, 0)
+
+  
+nueva_funcion <- function(x) {
+  if (x) {
+    "1"
+    "2"
+    "3"
+    "4"
+    "5"
+  } else {
+    return(0)
+  }
+}
+
+nueva_funcion(TRUE)
+```
+## funciones aptas para pipe: 
+Se tiene que pensar bien el retorno. Debe permitir continuar con una secuencia de pipes... por ejemplo, en dplyr o tidyr deberias tener un data.frame
+
+```{r invisible}
+mostrar_faltantes <- function(df) {
+ n <- sum(is.na(df))
+ cat("Valores faltantes: ", n, "\n", sep = "")
+
+ invisible(df)
+}
+mostrar_faltantes(df)
+
+# de forma interactiva no se ve que retorna df, pero:
+
+x <- mostrar_faltantes(iris)
+#> Valores faltantes: 0
+class(x)
+#> [1] "data.frame"
+dim(x)
+#> [1] 150 5
+
+
+
+# o usarlo 
+iris %>%
+ mostrar_faltantes() %>%
+ mutate(Sepal.Length = ifelse(Sepal.Length <= 5, NA, Sepal.Length)) %>%
+ mostrar_faltantes()
+```
+
+
+##Loops
 
 ```{r loops}
 
@@ -185,7 +287,7 @@ class(y) <- class(x) # ahora igualamos las clases
 y2 <- x
 y2[as.POSIXlt(x)$day != 29] <- NA
 # esto da lo mismo que ifelse()+class() hack:
-stopifnot(identical(y2, y))
+#stopifnot(identical(y2, y))   OJO!!!! por que pasa eso?
 ```
  
 ```{r if_ifelse ejemplo 3 diferentes modos de retorno y test}
@@ -207,25 +309,25 @@ cut divide el rango de x(vector) en intervalos y codifica los valores en x segú
 
 ```{r ejercicio libro}
 x <- 7
-fizzbuzz2 <- function(x) {
-  # these two lines check that x is a valid input
-  stopifnot(length(x) == 1)
-  stopifnot(is.numeric(x))
-  if (!(x %% 3)) {
-    if (!(x %% 5)) {
-      "fizzbuzz"
-    } else {
-      "fizz"
-    }
-  } else if (!(x %% 5)) {
-    "buzz"
-  } else {
-    # ensure that the function returns a character vector
-    as.character(x)
-  }
-}
+#fizzbuzz2 <- function(x) {
+  # # these two lines check that x is a valid input
+  # stopifnot(length(x) == 1)
+  # stopifnot(is.numeric(x))
+  # if (!(x %% 3)) {
+  #   if (!(x %% 5)) {
+  #     "fizzbuzz"
+  #   } else {
+  #     "fizz"
+  #   }
+  # } else if (!(x %% 5)) {
+  #   "buzz"
+  # } else {
+  #   # ensure that the function returns a character vector
+  #   as.character(x)
+#  }
+#}
 
-fizzbuzz2(c(1, 2))
+#fizzbuzz2(c(1, 2))
 ```
 
 Cómo podrías usar cut() (cortar()) para simplificar este conjunto de sentencias if-else anidadas?
@@ -245,4 +347,5 @@ if (temp <= 0) {
 ```{r}
 cut(0:30, 3)
 ```
+
 
