@@ -28,3 +28,28 @@ rescale01 <- function(x) {
 for (i in seq_along(df)) {
 df[[i]] <- rescale01(df[[i]])
 } 
+
+
+# calcula media de cada columa de df --------------------------------------
+
+output <- vector("double", ncol(df))  # 1. output
+for (i in seq_along(df)) {            # 2. secuencia
+  output[[i]] <- median(df[[i]])      # 3. cuerpo
+}
+output
+
+
+# imprime columnas de df --------------------------------------------------
+
+resultados <- vector("list", length(df))
+names(resultados) <- names(df)
+
+columnas <- names(df)
+for (i in columnas) {
+  print(df[, i])
+}
+# map de paquete purrr ----------------------------------------------------
+
+
+
+a <- map_dbl(df, mean)

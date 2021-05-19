@@ -5,6 +5,10 @@ editor_options:
   chunk_output_type: inline
 ---
 
+```{r setup, include = FALSE}
+library(tidyverse)
+```
+
 Tienen la ventaja:
 * Si se le da un nombre que identifica la acción que realiza, resulta más facil de leer el código
 * Si hay que hacer cambios, se hace en un único lugar
@@ -35,11 +39,11 @@ nombre <- function(x, y) {
 
 
 ```{r si}
-if (cond) {
-  
-}else{
-  
-}
+# if (cond) {
+#   
+# }else{
+#   
+# }
 ```
 
 * Puedes usar || (o) y &&(y) para combinar múltiples. 
@@ -104,6 +108,7 @@ df$d <- rescale01(df$d)
 ```
 
 ```{r}
+x <- c(TRUE, TRUE, FALSE, TRUE, FALSE)
 
   mean(is.na(x))
 
@@ -201,6 +206,7 @@ cut divide el rango de x(vector) en intervalos y codifica los valores en x segú
 ```
 
 ```{r ejercicio libro}
+x <- 7
 fizzbuzz2 <- function(x) {
   # these two lines check that x is a valid input
   stopifnot(length(x) == 1)
