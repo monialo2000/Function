@@ -41,15 +41,14 @@ output
 
 # imprime columnas de df --------------------------------------------------
 
-resultados <- vector("list", length(df))
-names(resultados) <- names(df)
+#resultados <- vector("list", length(df))
+#names(resultados) <- names(df)
 
 columnas <- names(df)
 for (i in columnas) {
   print(df[, i])
 }
 # map de paquete purrr ----------------------------------------------------
-
 
 
 a <- map_dbl(df, mean)
